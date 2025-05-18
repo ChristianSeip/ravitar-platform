@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+    <article class="prose lg:prose-xl mx-auto">
+        <h1>{{ article.title }}</h1>
+        <p class="text-sm text-gray-500">
+            Veröffentlicht am {{ article.createdAt|date('d.m.Y') }} von {{ article.author.email }}
+        </p>
+        {% if article.imageUrl %}
+            <img src="{{ article.imageUrl }}" alt="{{ article.title }}" class="my-6 rounded">
+        {% endif %}
+        {{ article.content|raw }}
+
+        <div class="mt-8 flex flex-wrap gap-2">
+            {% for tag in article.tags %}
+                <a href="{{ path('blog_list', {tag: tag.name}) }}"
+                   class="bg-blue-100 text-blue-800 px-3 py-1 rounded hover:bg-blue-200">
+                    #{{ tag.name }}
+                </a>
+            {% endfor %}
+        </div>
+    </article>
+{% endblock %}

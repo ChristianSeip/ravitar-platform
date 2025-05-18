@@ -1,0 +1,66 @@
+{# templates/partials/_form_wrapper.html.twig #}
+<div class="max-w-lg mx-auto bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden">
+    <div class="px-8 py-6">
+        {% if title is defined %}
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6">{{ title }}</h2>
+        {% endif %}
+
+        {{ form_start(form, { attr: { class: 'space-y-6' } }) }}
+        {{ form_errors(form) }}
+
+        {# Default-Attribute für Inputs #}
+        {% set default_widget_attr = {
+            class: 'w-full rounded border border-gray-300 bg-gray-50 px-3 py-2 ' ~
+            'focus:outline-none focus:ring focus:ring-blue-200 focus:border-blue-500'
+        } %}
+
+        {% for field in form %}
+            {% set opts       = field_options[field.vars.name]|default({}) %}
+            {% set label      = opts.label      is defined ? opts.label      : null %}
+            {% set label_html = opts.label_html is defined ? opts.label_html : false %}
+
+            {# CSRF-Feld unsichtbar rendern #}
+            {% if 'csrf_token' in field.vars.block_prefixes %}
+                {{ form_widget(field) }}
+
+                {# Checkbox inline #}
+            {% elseif 'checkbox' in field.vars.block_prefixes %}
+                <div class="flex items-center">
+                    {% set default_checkbox_attr = {
+                        class: 'h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
+                    } %}
+                    {% set checkbox_attr = default_checkbox_attr|merge(opts.widget_attr|default({})) %}
+                    {{ form_widget(field, { attr: checkbox_attr }) }}
+                    {{ form_label(field, label, {
+                        label_html: label_html,
+                        label_attr: opts.label_attr|default({ class: 'ml-2 block text-sm text-gray-700' })
+                    }) }}
+                </div>
+                {{ form_errors(field) }}
+
+                {# Alle anderen Felder #}
+            {% else %}
+                <div>
+                    {{ form_label(field, label, {
+                        label_attr: opts.label_attr|default({ class: 'block text-sm font-medium text-gray-700 mb-2' })
+                    }) }}
+
+                    {% set widget_attr = default_widget_attr|merge(opts.widget_attr|default({})) %}
+                    {{ form_widget(field, { attr: widget_attr }) }}
+
+                    {{ form_errors(field) }}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <div class="pt-4">
+            <button type="submit"
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm
+                       text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-200">
+                {{ button_label|default('Absenden') }}
+            </button>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>

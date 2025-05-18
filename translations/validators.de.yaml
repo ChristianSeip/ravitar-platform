@@ -1,0 +1,21 @@
+user:
+  registration:
+    form:
+      hint:
+        username:
+          not_blank:     'Der Benutzername darf nicht leer sein.'
+          min_length:    'Der Benutzername muss mindestens {{ limit }} Zeichen lang sein.'
+          max_length:    'Der Benutzername darf maximal {{ limit }} Zeichen lang sein.'
+        email:
+          not_blank:      'Die E-Mail Adresse darf nicht leer sein.'
+        password:
+          not_blank:      'Das Passwort darf nicht leer sein.'
+          min_length:     'Das Passwort muss mindestens {{ limit }} Zeichen lang sein.'
+          max_length:     'Das Passwort darf maximal {{ limit }} Zeichen lang sein.'
+        terms:
+          required:       'Du musst den Nutzungsbedingungen zustimmen.'
+        dob:
+          not_blank:      'Das Geburtsdatum darf nicht leer sein.'
+          invalid_date:   'Dieses Geburtsdatum ist ungültig.'
+          min_age:        'Das Mindestalter beträgt 14 Jahre.'
+          max_age:        'Das Höchstalter beträgt 100 Jahre.'

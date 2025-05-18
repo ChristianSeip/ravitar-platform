@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'user.registration.form.title'|trans }}{% endblock %}
+
+{% block content %}
+    {% set termsUrl = path('nutzungsbedingungen') %}
+    {% set translatedLabel = 'user.registration.form.label.terms'
+        |trans({'%terms_url%': termsUrl}, 'messages') %}
+
+    {% include '_form_wrapper.html.twig' with {
+        form: registrationForm,
+        title: ('user.registration.form.title'|trans),
+        button_label: ('user.registration.form.submit'|trans),
+        field_options: {
+            agreeTerms: {
+                label: translatedLabel,
+                label_html: true,
+                widget_attr: { class: 'h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500' }
+            }
+        }
+    } %}
+{% endblock %}

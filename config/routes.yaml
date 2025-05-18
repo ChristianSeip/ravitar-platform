@@ -1,0 +1,5 @@
+controllers:
+    resource:
+        path: ../src/Domain/
+        namespace: App\Domain
+    type: attribute
