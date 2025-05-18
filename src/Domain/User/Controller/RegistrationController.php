@@ -21,8 +21,11 @@ class RegistrationController extends AbstractController
 	}
 
 	#[Route('/register', name: 'app_register')]
-	public function register(Request $request, TranslatorInterface $translator,): Response
+	public function register(Request $request, TranslatorInterface $translator): Response
 	{
+		if ($this->getUser()) {
+			return $this->redirectToRoute('landing');
+		}
 		$user = new User();
 		$form = $this->createForm(RegistrationFormType::class, $user);
 		$form->handleRequest($request);
