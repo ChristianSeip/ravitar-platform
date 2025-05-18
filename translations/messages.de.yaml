@@ -24,3 +24,6 @@ user:
       password: 'Passwort'
       remember_me: 'Angemeldet bleiben'
       submit: 'Anmelden'
+    error:
+      locked: 'Dein Account ist gesperrt. Bitte wende dich an den Support.'
+      not_verified: 'Bitte bestätige zuerst deine E-Mail-Adresse.'

@@ -35,6 +35,7 @@ security:
                 httponly: true
                 secure: auto
             login_throttling: ~
+            user_checker: App\Domain\User\Security\AuthStatusCheck
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
