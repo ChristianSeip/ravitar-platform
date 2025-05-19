@@ -49,6 +49,10 @@
                         </article>
                     {% endfor %}
                 </div>
+                {% include '_pagination.html.twig' with {
+                    pagination: pagination,
+                    routeParams: routeParams ?? {}
+                } %}
             {% endif %}
         </div>
     </section>

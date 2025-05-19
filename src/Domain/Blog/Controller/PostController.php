@@ -7,6 +7,8 @@ use App\Domain\Blog\Form\PostFormType;
 use App\Domain\Blog\Repository\PostRepository;
 use App\Domain\Blog\Repository\TagRepository;
 use App\Domain\Blog\Service\TagService;
+use App\Domain\Common\Pagination\PaginationResult;
+use App\Domain\Common\Pagination\PaginationService;
 use App\Domain\Common\Service\ImageStorageService;
 use App\Domain\Common\Service\SlugService;
 use App\Domain\User\Service\UserContextService;
@@ -101,21 +103,24 @@ class PostController extends AbstractController
 	}
 
 	#[Route('/blog/posts/tag/{slug}', name: 'blog_post_by_tag')]
-	public function showByTag(string $slug, PostRepository $postRepo, TagRepository $tagRepo): Response
-	{
+	public function showByTag(string $slug, Request $request, PostRepository $postRepo, TagRepository $tagRepo, PaginationService $paginator): Response {
 		$tag = $tagRepo->findOneBy(['slug' => $slug]);
-
 		if (!$tag) {
 			throw $this->createNotFoundException('Tag not found.');
 		}
 
-		$posts = $postRepo->findByTagSlug($slug);
+		$total = $postRepo->countByTagSlug($slug);
+		$pagination = $paginator->paginate($request, $total);
+
+		$posts = $postRepo->findByTagSlugPaginated($slug, $pagination->limit, $pagination->offset);
 
 		return $this->render('blog/list.html.twig', [
 			'title'     => 'Beiträge mit Tag: ' . $tag->getName(),
 			'posts'     => $posts,
+			'pagination' => $pagination,
 			'emptyText' => 'Keine Beiträge mit diesem Tag gefunden.',
 			'canonical' => $this->generateUrl('blog_post_by_tag', ['slug' => $slug], UrlGeneratorInterface::ABSOLUTE_URL),
+			'routeParams' => ['slug' => $slug]
 		]);
 	}
 }
