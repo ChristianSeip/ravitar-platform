@@ -7,6 +7,7 @@
     {% set translatedLabel = 'user.registration.form.label.terms'
         |trans({'%terms_url%': termsUrl}, 'messages') %}
 
+    <div class="max-w-lg mx-auto bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden">
     {% include '_form_wrapper.html.twig' with {
         form: registrationForm,
         title: ('user.registration.form.title'|trans),
@@ -19,4 +20,5 @@
             }
         }
     } %}
+    </div>
 {% endblock %}

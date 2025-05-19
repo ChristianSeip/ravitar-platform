@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'blog.post.form.title'|trans }}{% endblock %}
+
+{% block content %}
+
+    <div class="mx-auto bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden">
+    {% include '_form_wrapper.html.twig' with {
+        form: form,
+        title: ('blog.post.form.title'|trans),
+        button_label: ('blog.post.form.submit'|trans),
+    } %}
+    </div>
+{% endblock %}

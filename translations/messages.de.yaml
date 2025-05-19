@@ -27,3 +27,8 @@ user:
     error:
       locked: 'Dein Account ist gesperrt. Bitte wende dich an den Support.'
       not_verified: 'Bitte bestätige zuerst deine E-Mail-Adresse.'
+blog:
+  post:
+    form:
+      title: 'Post Editor'
+      submit: 'Speichern'

@@ -6,6 +6,7 @@
 parameters:
     mailer_from_address: '%env(MAIL_FROM_ADDRESS)%'
     mailer_from_name: '%env(MAIL_FROM_NAME)%'
+    blog_post_upload_dir: '%kernel.project_dir%/public/uploads/blog'
 
 services:
     # default configuration for services in *this* file
@@ -30,3 +31,9 @@ services:
             $fromName: '%mailer_from_name%'
         tags:
             - { name: 'kernel.event_listener', event: 'App\Domain\User\Event\UserRegisteredEvent', method: 'onUserRegistered' }
+    App\Domain\Common\Service\SlugServiceInterface:
+        alias: App\Domain\Common\Service\SlugService
+    App\Domain\Common\Service\SlugService:
+        arguments:
+            $slugger: '@slugger'
+            $doctrine: '@doctrine'
