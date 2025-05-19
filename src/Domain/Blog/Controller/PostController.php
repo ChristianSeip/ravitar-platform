@@ -83,4 +83,18 @@ class PostController extends AbstractController
 			'isEdit' => $isEdit,
 		]);
 	}
+
+	#[Route('/blog/posts/{slug}', name: 'blog_post_show')]
+	public function __invoke(string $slug, PostRepository $postRepo): Response
+	{
+		$post = $postRepo->findOneBy(['slug' => $slug]);
+
+		if (!$post || $post->isDeleted()) {
+			throw $this->createNotFoundException('Post not found.');
+		}
+
+		return $this->render('blog/show.html.twig', [
+			'post' => $post,
+		]);
+	}
 }
