@@ -15,4 +15,17 @@ class PostRepository extends ServiceEntityRepository
 	{
 		parent::__construct($registry, Post::class);
 	}
+
+	public function findByTagSlug(string $slug): array
+	{
+		return $this->createQueryBuilder('p')
+			->leftJoin('p.tags', 't')
+			->addSelect('t')
+			->where('t.slug = :slug')
+			->andWhere('p.isDeleted = false')
+			->orderBy('p.createdAt', 'DESC')
+			->setParameter('slug', $slug)
+			->getQuery()
+			->getResult();
+	}
 }

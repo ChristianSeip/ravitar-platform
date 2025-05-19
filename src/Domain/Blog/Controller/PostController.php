@@ -5,6 +5,7 @@ namespace App\Domain\Blog\Controller;
 use App\Domain\Blog\Entity\Post;
 use App\Domain\Blog\Form\PostFormType;
 use App\Domain\Blog\Repository\PostRepository;
+use App\Domain\Blog\Repository\TagRepository;
 use App\Domain\Blog\Service\TagService;
 use App\Domain\Common\Service\ImageStorageService;
 use App\Domain\Common\Service\SlugService;
@@ -14,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use RuntimeException;
 
@@ -95,6 +97,25 @@ class PostController extends AbstractController
 
 		return $this->render('blog/show.html.twig', [
 			'post' => $post,
+		]);
+	}
+
+	#[Route('/blog/posts/tag/{slug}', name: 'blog_post_by_tag')]
+	public function showByTag(string $slug, PostRepository $postRepo, TagRepository $tagRepo): Response
+	{
+		$tag = $tagRepo->findOneBy(['slug' => $slug]);
+
+		if (!$tag) {
+			throw $this->createNotFoundException('Tag not found.');
+		}
+
+		$posts = $postRepo->findByTagSlug($slug);
+
+		return $this->render('blog/list.html.twig', [
+			'title'     => 'Beiträge mit Tag: ' . $tag->getName(),
+			'posts'     => $posts,
+			'emptyText' => 'Keine Beiträge mit diesem Tag gefunden.',
+			'canonical' => $this->generateUrl('blog_post_by_tag', ['slug' => $slug], UrlGeneratorInterface::ABSOLUTE_URL),
 		]);
 	}
 }
