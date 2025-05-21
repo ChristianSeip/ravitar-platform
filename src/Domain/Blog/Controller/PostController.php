@@ -7,7 +7,6 @@ use App\Domain\Blog\Form\PostFormType;
 use App\Domain\Blog\Repository\PostRepository;
 use App\Domain\Blog\Repository\TagRepository;
 use App\Domain\Blog\Service\TagService;
-use App\Domain\Common\Pagination\PaginationResult;
 use App\Domain\Common\Pagination\PaginationService;
 use App\Domain\Common\Service\ImageStorageService;
 use App\Domain\Common\Service\SlugService;
@@ -20,6 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use RuntimeException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PostController extends AbstractController
 {
@@ -27,7 +27,8 @@ class PostController extends AbstractController
 															private readonly TagService $tagService,
 															private readonly SlugService $slugService,
 															private readonly UserContextService $userContext,
-															private readonly ImageStorageService $imageStorage)
+															private readonly ImageStorageService $imageStorage,
+															private readonly TranslatorInterface $translator)
 	{
 	}
 
@@ -39,7 +40,7 @@ class PostController extends AbstractController
 		$post = $slug ? $postRepo->findOneBy(['slug' => $slug]) : new Post();
 
 		if (!$post) {
-			throw $this->createNotFoundException('Post not found.');
+			throw $this->createNotFoundException($this->translator->trans('blog.tag.not_found', [], 'messages'));
 		}
 
 		$isEdit = $post->getId() !== null;
@@ -73,7 +74,7 @@ class PostController extends AbstractController
 				$this->em->persist($post);
 				$this->em->flush();
 
-				$this->addFlash('success', $isEdit ? 'Post updated.' : 'Post created.');
+				$this->addFlash('success', $isEdit ? $this->translator->trans('blog.post.form.updated', [], 'messages') : $this->translator->trans('blog.post.form.created', [], 'messages'));
 				return $this->redirectToRoute('blog_post_edit', ['slug' => $post->getSlug()]);
 			}
 			catch (RuntimeException $e) {
@@ -94,7 +95,7 @@ class PostController extends AbstractController
 		$post = $postRepo->findOneBy(['slug' => $slug]);
 
 		if (!$post || $post->isDeleted()) {
-			throw $this->createNotFoundException('Post not found.');
+			throw $this->createNotFoundException($this->translator->trans('blog.post.not_found', [], 'messages'));
 		}
 
 		return $this->render('blog/show.html.twig', [
@@ -106,7 +107,7 @@ class PostController extends AbstractController
 	public function showByTag(string $slug, Request $request, PostRepository $postRepo, TagRepository $tagRepo, PaginationService $paginator): Response {
 		$tag = $tagRepo->findOneBy(['slug' => $slug]);
 		if (!$tag) {
-			throw $this->createNotFoundException('Tag not found.');
+			throw $this->createNotFoundException($this->translator->trans('blog.tag.not_found', [], 'messages'));
 		}
 
 		$total = $postRepo->countByTagSlug($slug);
@@ -115,10 +116,10 @@ class PostController extends AbstractController
 		$posts = $postRepo->findByTagSlugPaginated($slug, $pagination->limit, $pagination->offset);
 
 		return $this->render('blog/list.html.twig', [
-			'title'     => 'Beiträge mit Tag: ' . $tag->getName(),
+			'title'     => $this->translator->trans('blog.search.title', [], 'messages') . ' (' . $this->translator->trans('blog.tag.tag', [], 'messages') . ': ' . $tag->getName() . ')',
 			'posts'     => $posts,
 			'pagination' => $pagination,
-			'emptyText' => 'Keine Beiträge mit diesem Tag gefunden.',
+			'emptyText' => $this->translator->trans('blog.search.not_found', [], 'messages'),
 			'canonical' => $this->generateUrl('blog_post_by_tag', ['slug' => $slug], UrlGeneratorInterface::ABSOLUTE_URL),
 			'routeParams' => ['slug' => $slug]
 		]);

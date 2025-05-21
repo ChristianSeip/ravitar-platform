@@ -9,9 +9,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SearchController extends AbstractController {
-	public function __construct(private readonly PostRepository $postRepo, private readonly SearchParserService $parser)
+	public function __construct(private readonly PostRepository $postRepo, private readonly SearchParserService $parser, private readonly TranslatorInterface $translator)
 	{
 	}
 
@@ -24,10 +25,10 @@ class SearchController extends AbstractController {
 		if ($rawQuery === '') {
 			return $this->render('blog/list.html.twig', [
 				'posts'     => [],
-				'title'     => 'Suchergebnisse',
+				'title'     => $this->translator->trans('blog.search.title', [], 'messages'),
 				'canonical' => $request->getUri(),
 				'pagination' => null,
-				'emptyText' => 'Bitte gib einen Suchbegriff ein.',
+				'emptyText' => $this->translator->trans('blog.search.no_keyword', [], 'messages'),
 			]);
 		}
 
@@ -44,9 +45,9 @@ class SearchController extends AbstractController {
 		return $this->render('blog/list.html.twig', [
 			'posts'      => $posts,
 			'pagination' => $pagination,
-			'title'      => sprintf('Suchergebnisse für: "%s"', $rawQuery),
+			'title'      => $this->translator->trans('blog.search.title', [], 'messages') . ' (' . $rawQuery . ')',
 			'canonical'  => $request->getUri(),
-			'emptyText'  => 'Kein Beitrag gefunden.',
+			'emptyText'  => $this->translator->trans('blog.search.no_result', [], 'messages'),
 			'routeParams' => ['q' => $rawQuery],
 		]);
 	}

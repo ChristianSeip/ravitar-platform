@@ -32,11 +32,8 @@
 <div data-search-target="form" class="hidden md:block bg-white">
     <div class="container mx-auto px-4 lg:px-8 py-4">
         <form action="{{ path('blog_post_search') }}" method="get" class="flex justify-center">
-            <input type="text" name="q" value="{{ app.request.get('q') }}" placeholder="Suchbegriff…" class="w-full md:w-1/3 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" aria-label="Suche nach Blogbeiträgen"/>
-            <button
-                    type="submit"
-                    class="px-3 py-2 bg-indigo-600 text-white rounded-r-lg hover:bg-indigo-700 transition text-sm !bg-indigo-600"
-            >Suchen</button>
+            <input type="text" name="q" value="{{ app.request.get('q') }}" placeholder="{{ 'blog.search.placeholder'|trans }}" class="w-full md:w-1/3 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" aria-label="Suche nach Blogbeiträgen"/>
+            <button type="submit" class="px-3 py-2 bg-indigo-600 text-white rounded-r-lg hover:bg-indigo-700 transition text-sm !bg-indigo-600">{{ 'blog.search.submit'|trans }}</button>
         </form>
     </div>
 </div>

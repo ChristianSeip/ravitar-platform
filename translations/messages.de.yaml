@@ -32,3 +32,17 @@ blog:
     form:
       title: 'Post Editor'
       submit: 'Speichern'
+      updated: 'Aktualisiert'
+      created: 'Erstellt'
+    not_found: "Dieser Beitrag existiert nicht."
+    about_author: "Über den Author"
+  search:
+    title: "Suchergebnis"
+    placeholder: "Suchbegriff..."
+    submit: "Suche"
+    no_result: "Es konnten keine Ergebnisse gefunden werden."
+    no_keyword: "Bitte gib einen Suchbegriff ein."
+    posts: "Beiträge"
+  tag:
+    tag: "Tag"
+    not_found: "Dieser Tag existiert nicht."

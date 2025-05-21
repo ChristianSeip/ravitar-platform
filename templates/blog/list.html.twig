@@ -12,12 +12,12 @@
     <section>
         <div class="max-w-5xl mx-auto px-6 py-12">
             <h1 class="text-3xl font-bold text-gray-900 mb-8">
-                {{ title ?? 'Beiträge' }}
+                {{ title ?? 'blog.search.posts'|trans }}
             </h1>
 
             {% if posts is empty %}
                 <p class="text-gray-600 italic">
-                    {{ emptyText ?? 'Keine Beiträge gefunden.' }}
+                    {{ emptyText ?? 'blog.search.no_result'|trans }}
                 </p>
             {% else %}
                 <div class="grid gap-8">

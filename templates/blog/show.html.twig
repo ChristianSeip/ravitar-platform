@@ -35,7 +35,7 @@
             {% endif %}
 
             <div class="mt-4 flex justify-center gap-6 text-sm text-gray-500 font-mono">
-                <span>{{ post.createdAt|date('d. F Y') }}</span>
+                <span>{{ post.createdAt|date('d.m.Y H:i') }}</span>
                 <span>von {{ post.author.username }}</span>
                 <span id="readTime" class="bg-gray-200 px-2 py-1 rounded text-xs uppercase tracking-wider"></span>
             </div>
@@ -64,7 +64,7 @@
 
     {% if post.author.profile.biography %}
         <section class="max-w-3xl mx-auto px-6 py-12 mt-16 border-t border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900">Über den Autor</h2>
+            <h2 class="text-xl font-bold text-gray-900">{{ 'blog.post.about_author'|trans }}</h2>
             <div class="flex items-center space-x-4">
                 <div>
                     <p class="text-lg font-semibold text-gray-900">{{ post.author.username }}</p>
