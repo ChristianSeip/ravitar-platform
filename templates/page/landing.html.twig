@@ -10,8 +10,7 @@
         </div>
 
         <div class="container mx-auto px-4 py-24 lg:py-32 relative z-10 text-center">
-            <h1 class="text-5xl md:text-6xl font-extrabold text-white leading-tight animate-fade-in-up">Willkommen bei
-                Ravitar</h1>
+            <h1 class="text-5xl md:text-6xl font-extrabold text-white leading-tight animate-fade-in-up">Willkommen bei Ravitar</h1>
             <p class="mt-4 text-xl md:text-2xl text-white/90 animate-fade-in-up animate-delay-200">
                 Deine Plattform für Entwickler, Admins & Tech-Interessierte
             </p>
@@ -24,14 +23,6 @@
 
     <div class="section-diagonal no-section-bottom"></div>
 
-    {% set posts = [
-        { title: 'Post 1', excerpt: '…', date: '2025-05-15', colsMd: 2, rowsMd: 1, colsLg: 2, rowsLg: 1 },
-        { title: 'Post 2', excerpt: '…', date: '2025-05-14', colsMd: 1, rowsMd: 1, colsLg: 1, rowsLg: 1 },
-        { title: 'Post 3', excerpt: '…', date: '2025-05-13', colsMd: 1, rowsMd: 1, colsLg: 1, rowsLg: 1 },
-        { title: 'Post 1', excerpt: '…', date: '2025-05-15', colsMd: 1, rowsMd: 1, colsLg: 1, rowsLg: 1 },
-        { title: 'Post 2', excerpt: '…', date: '2025-05-14', colsMd: 1, rowsMd: 1, colsLg: 1, rowsLg: 1 },
-    ] %}
-
     <section class="mt-12 py-16">
         <div class="container mx-auto px-4 lg:px-8">
             <h2 class="text-3xl font-bold mb-8 text-center animate-fade-in-up">
@@ -39,22 +30,45 @@
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 auto-rows-fr gap-8">
-                {% for post in posts %}
-                    {% set spanClasses = [
-                        'md:col-span-' ~ post.colsMd,
-                        'md:row-span-' ~ post.rowsMd,
-                        'lg:col-span-' ~ post.colsLg,
-                        'lg:row-span-' ~ post.rowsLg
-                    ]|join(' ') %}
+                {% set maxCols = 3 %}
+                {% set maxRows = 2 %}
+                {% set currentRow = 1 %}
+                {% set currentRowCols = 0 %}
 
-                    <article class="card-hover animate-fade-in-up animate-delay-{{ loop.index0 * 150 }} {{ spanClasses }}">
-                        <h3 class="text-{{ loop.first ? '2xl font-bold' : 'xl font-semibold' }} mb-2">
-                            {{ post.title }}{% if loop.first %} (Featured){% endif %}
-                        </h3>
-                        <p class="text-gray-600 mb-4">{{ post.excerpt }}</p>
-                        <div class="text-sm text-gray-400 mb-3">{{ post.date }}</div>
-                        <a href="#" class="text-indigo-600 hover:underline">Weiterlesen →</a>
-                    </article>
+                {% for post in latestBlogPosts %}
+                    {% set isFirst = loop.first %}
+                    {% set desiredCols = isFirst ? 2 : post.gridCols %}
+                    {% set desiredRows = post.gridRows %}
+
+                    {% if currentRowCols + desiredCols > maxCols %}
+                        {% set currentRow = currentRow + 1 %}
+                        {% set currentRowCols = 0 %}
+                    {% endif %}
+
+                    {% if currentRow > maxRows %}
+                        {# NICHTS anzeigen #}
+                    {% else %}
+                        {% set availableCols = maxCols - currentRowCols %}
+                        {% set cols = desiredCols > availableCols ? availableCols : desiredCols %}
+                        {% set rows = desiredRows %}
+                        {% set currentRowCols = currentRowCols + cols %}
+
+                        {% set spanClasses = [
+                            'md:col-span-' ~ cols,
+                            'md:row-span-' ~ rows,
+                            'lg:col-span-' ~ cols,
+                            'lg:row-span-' ~ rows
+                        ]|join(' ') %}
+
+                        <article class="card-hover animate-fade-in-up animate-delay-{{ loop.index0 * 150 }} {{ spanClasses }}">
+                            <h3 class="text-{{ isFirst ? '2xl font-bold' : 'xl font-semibold' }} mb-2">
+                                {{ post.title }}
+                            </h3>
+                            <p class="text-gray-600 mb-4">{{ post.excerpt }}</p>
+                            <div class="text-sm text-gray-400 mb-3">{{ post.createdAt|date('d.m.Y H:i') }}</div>
+                            <a href="{{ path('blog_post_show', {slug: post.slug}) }}" class="text-indigo-600 hover:underline">Weiterlesen →</a>
+                        </article>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -82,10 +96,6 @@
                     Ravitar ist eine modulare Plattform, die Wissen, Tools und Community für Entwickler &
                     Systemadministratoren intelligent verbindet – damit du immer up-to-date bleibst.
                 </p>
-            </div>
-            <div class="animate-fade-in-up animate-delay-200">
-                <img src="https://via.placeholder.com/500x300" alt="Ravitar Überblick"
-                     class="w-full h-auto rounded-lg shadow-lg">
             </div>
         </div>
     </section>

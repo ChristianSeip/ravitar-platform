@@ -8,7 +8,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class StaticPageController extends AbstractController
 {
-	#[Route('/',               				name: 'landing',    				 defaults: ['slug' => 'landing'])]
 	#[Route('/impressum',      				name: 'impressum',  				 defaults: ['slug' => 'impressum'])]
 	#[Route('/datenschutz',    				name: 'datenschutz',				 defaults: ['slug' => 'datenschutz'])]
 	#[Route('/nutzungsbedingungen', 	name: 'nutzungsbedingungen', defaults: ['slug' => 'nutzungsbedingungen'])]

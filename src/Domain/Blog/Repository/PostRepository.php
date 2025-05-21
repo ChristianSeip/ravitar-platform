@@ -87,4 +87,16 @@ class PostRepository extends ServiceEntityRepository
 
 		return $ids ? $this->findBy(['id' => $ids], ['createdAt' => 'DESC']) : [];
 	}
+
+	public function findLatest(int $limit): array
+	{
+		return $this->createQueryBuilder('p')
+			->leftJoin('p.tags', 't')
+			->addSelect('t')
+			->where('p.isDeleted = false')
+			->orderBy('p.createdAt', 'DESC')
+			->setMaxResults($limit)
+			->getQuery()
+			->getResult();
+	}
 }
