@@ -6,9 +6,6 @@ use App\Domain\Blog\Entity\Post;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Post>
- */
 class PostRepository extends ServiceEntityRepository
 {
 	public function __construct(ManagerRegistry $registry)
@@ -16,43 +13,78 @@ class PostRepository extends ServiceEntityRepository
 		parent::__construct($registry, Post::class);
 	}
 
+	public function countByTagSlug(string $slug): int
+	{
+		return (int) $this->createTagQueryBuilder($slug)
+			->select('COUNT(p.id)')
+			->getQuery()
+			->getSingleScalarResult();
+	}
+
 	public function findByTagSlug(string $slug): array
 	{
-		return $this->createQueryBuilder('p')
-			->leftJoin('p.tags', 't')
+		return $this->createTagQueryBuilder($slug)
 			->addSelect('t')
-			->where('t.slug = :slug')
-			->andWhere('p.isDeleted = false')
 			->orderBy('p.createdAt', 'DESC')
-			->setParameter('slug', $slug)
 			->getQuery()
 			->getResult();
 	}
 
 	public function findByTagSlugPaginated(string $slug, int $limit, int $offset): array
 	{
-		return $this->createQueryBuilder('p')
-			->leftJoin('p.tags', 't')
+		return $this->createTagQueryBuilder($slug)
 			->addSelect('t')
-			->where('t.slug = :slug')
-			->andWhere('p.isDeleted = false')
 			->orderBy('p.createdAt', 'DESC')
-			->setParameter('slug', $slug)
 			->setMaxResults($limit)
 			->setFirstResult($offset)
 			->getQuery()
 			->getResult();
 	}
 
-	public function countByTagSlug(string $slug): int
+	private function createTagQueryBuilder(string $slug)
 	{
-		return (int) $this->createQueryBuilder('p')
-			->select('COUNT(p.id)')
-			->leftJoin('p.tags', 't')
+		return $this->createQueryBuilder('p')
+			->innerJoin('p.tags', 't')
 			->where('t.slug = :slug')
 			->andWhere('p.isDeleted = false')
-			->setParameter('slug', $slug)
-			->getQuery()
-			->getSingleScalarResult();
+			->setParameter('slug', $slug);
+	}
+
+	public function countByTsQuery(string $tsQuery): int
+	{
+		$conn = $this->getEntityManager()->getConnection();
+
+		$sql = <<<SQL
+        SELECT COUNT(*) FROM blog_post
+        WHERE is_deleted = false
+          AND to_tsvector('german', title || ' ' || content)
+          @@ to_tsquery('german', :query)
+        SQL;
+
+		return (int) $conn->prepare($sql)
+			->executeQuery(['query' => $tsQuery])
+			->fetchOne();
+	}
+
+	public function findByTsQuery(string $tsQuery, int $limit, int $offset): array
+	{
+		$conn = $this->getEntityManager()->getConnection();
+
+		$sql = <<<SQL
+        SELECT id FROM blog_post
+        WHERE is_deleted = false
+          AND to_tsvector('german', title || ' ' || content)
+          @@ to_tsquery('german', :query)
+        ORDER BY created_at DESC
+        LIMIT :limit OFFSET :offset
+        SQL;
+
+		$ids = $conn->prepare($sql)->executeQuery([
+			'query'  => $tsQuery,
+			'limit'  => $limit,
+			'offset' => $offset,
+		])->fetchFirstColumn();
+
+		return $ids ? $this->findBy(['id' => $ids], ['createdAt' => 'DESC']) : [];
 	}
 }
