@@ -36,6 +36,8 @@ blog:
       created: 'Erstellt'
     not_found: "Dieser Beitrag existiert nicht."
     about_author: "Über den Author"
+    list:
+      title: "Alle Beiträge"
   search:
     title: "Suchergebnis"
     placeholder: "Suchbegriff..."

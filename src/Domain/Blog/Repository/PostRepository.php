@@ -4,6 +4,7 @@ namespace App\Domain\Blog\Repository;
 
 use App\Domain\Blog\Entity\Post;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
 
 class PostRepository extends ServiceEntityRepository
@@ -96,6 +97,30 @@ class PostRepository extends ServiceEntityRepository
 			->where('p.isDeleted = false')
 			->orderBy('p.createdAt', 'DESC')
 			->setMaxResults($limit)
+			->getQuery()
+			->getResult();
+	}
+
+	public function countAll(): int
+	{
+		return (int) $this->createQueryBuilder('p')
+			->select('COUNT(p.id)')
+			->where('p.isDeleted = false')
+			->andWhere('p.createdAt <= :now')
+			->setParameter('now', new \DateTimeImmutable(), Types::DATETIME_IMMUTABLE)
+			->getQuery()
+			->getSingleScalarResult();
+	}
+
+	public function findAllPaginated(int $limit, int $offset): array
+	{
+		return $this->createQueryBuilder('p')
+			->where('p.isDeleted = false')
+			->andWhere('p.createdAt <= :now')
+			->setParameter('now', new \DateTimeImmutable(), Types::DATETIME_IMMUTABLE)
+			->orderBy('p.createdAt', 'DESC')
+			->setMaxResults($limit)
+			->setFirstResult($offset)
 			->getQuery()
 			->getResult();
 	}

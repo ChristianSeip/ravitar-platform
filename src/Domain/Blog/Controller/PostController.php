@@ -32,6 +32,23 @@ class PostController extends AbstractController
 	{
 	}
 
+	#[Route('/blog/posts', name: 'blog_post_list')]
+	public function list(Request $request, PostRepository $postRepo, PaginationService $paginator): Response
+	{
+		$total = $postRepo->countAll();
+		$pagination = $paginator->paginate($request, $total);
+		$posts = $postRepo->findAllPaginated($pagination->limit, $pagination->offset);
+
+		return $this->render('blog/list.html.twig', [
+			'title'       => $this->translator->trans('blog.post.list.title', [], 'messages'),
+			'posts'       => $posts,
+			'pagination'  => $pagination,
+			'emptyText' 	=> $this->translator->trans('blog.search.not_found', [], 'messages'),
+			'canonical'   => $this->generateUrl('blog_post_list', [], UrlGeneratorInterface::ABSOLUTE_URL),
+			'routeParams' => []
+		]);
+	}
+
 	#[Route('/blog/posts/new', name: 'blog_post_create')]
 	#[Route('/blog/posts/{slug}/edit', name: 'blog_post_edit')]
 	#[IsGranted('ROLE_ADMIN')]

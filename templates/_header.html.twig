@@ -4,7 +4,7 @@
 
         {# Desktop-Nav #}
         <nav class="hidden md:flex space-x-6 items-center">
-            <a href="#" class="text-gray-700 hover:text-[var(--color-primary-hover)] transition">Blog</a>
+            <a href="{{ path('blog_post_list') }}" class="text-gray-700 hover:text-[var(--color-primary-hover)] transition">Blog</a>
             <a href="https://forum.ravitar.com" class="text-gray-700 hover:text-[var(--color-primary-hover)] transition">Community</a>
         </nav>
 
@@ -20,11 +20,8 @@
     <div data-menu-target="panel" class="md:hidden hidden bg-white">
         <nav class="px-4 py-2 space-y-2" data-action="click->menu#toggle">
             <a href="#" class="block text-gray-700 hover:text-[var(--color-primary-hover)] transition">Blog</a>
-            <button type="button"
-                    class="block w-full text-left text-gray-700 hover:text-[var(--color-primary-hover)] transition"
-                    data-action="search#toggle">Suche
-            </button>
-            <a href="#" class="block text-gray-700 hover:text-[var(--color-primary-hover)] transition">Community</a>
+            <button type="button" class="block w-full text-left text-gray-700 hover:text-[var(--color-primary-hover)] transition" data-action="search#toggle">Suche</button>
+            <a href="https://forum.ravitar.com" class="block text-gray-700 hover:text-[var(--color-primary-hover)] transition">Community</a>
         </nav>
     </div>
 </header>
