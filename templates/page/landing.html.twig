@@ -3,10 +3,10 @@
 {% block title %}Startseite{% endblock %}
 
 {% block content %}
-    <section class="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 clip-hero">
+    <section class="relative overflow-hidden bg-gradient-to-br from-[var(--color-primary-700)] via-[var(--color-primary-500)] to-[var(--color-accent-500)] clip-hero">
         <div class="absolute inset-0 overflow-hidden">
-            <div class="absolute top-0 -left-24 w-64 h-64 bg-indigo-300/30 rounded-full animate-float"></div>
-            <div class="absolute -bottom-24 right-0 w-72 h-72 bg-pink-300/30 rounded-full animate-float animate-delay-200"></div>
+            <div class="absolute top-0 -left-24 w-64 h-64 bg-[var(--color-primary-300)]/30 rounded-full animate-float"></div>
+            <div class="absolute -bottom-24 right-0 w-72 h-72 bg-[var(--color-accent-100)]/30 rounded-full animate-float animate-delay-200"></div>
         </div>
 
         <div class="container mx-auto px-4 py-24 lg:py-32 relative z-10 text-center">
@@ -14,8 +14,9 @@
             <p class="mt-4 text-xl md:text-2xl text-white/90 animate-fade-in-up animate-delay-200">
                 Deine Plattform für Entwickler, Admins & Tech-Interessierte
             </p>
+
             <div class="mt-8 sm:flexsm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 animate-fade-in-up animate-delay-400">
-                <a href="{{ path('blog_post_list') }}" class="btn-primary text-center">Beiträge entdecken</a>
+                <a href="{{ path('blog_post_list') }}" class="btn-contrast text-center">Beiträge entdecken</a>
                 <a href="https://forum.ravitar.com" class="btn-secondary text-center">Zur Community</a>
             </div>
         </div>
@@ -25,9 +26,7 @@
 
     <section class="mt-12 py-16">
         <div class="container mx-auto px-4 lg:px-8">
-            <h2 class="text-3xl font-bold mb-8 text-center animate-fade-in-up">
-                Aktuelle Blog-Beiträge
-            </h2>
+            <h2 class="text-3xl font-bold mb-8 text-center text-[var(--color-text)] animate-fade-in-up">Aktuelle Blog-Beiträge</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 auto-rows-fr gap-8">
                 {% set maxCols = 3 %}
@@ -61,12 +60,14 @@
                         ]|join(' ') %}
 
                         <article class="card-hover animate-fade-in-up animate-delay-{{ loop.index0 * 150 }} {{ spanClasses }}">
-                            <h3 class="text-{{ isFirst ? '2xl font-bold' : 'xl font-semibold' }} mb-2">
-                                {{ post.title }}
-                            </h3>
-                            <p class="text-gray-600 mb-4">{{ post.excerpt }}</p>
-                            <div class="text-sm text-gray-400 mb-3">{{ post.createdAt|date('d.m.Y H:i') }}</div>
-                            <a href="{{ path('blog_post_show', {slug: post.slug}) }}" class="text-indigo-600 hover:underline">Weiterlesen →</a>
+                            <a href="{{ path('blog_post_show', {slug: post.slug}) }}">
+                                <h3 class="text-{{ isFirst ? '2xl font-bold' : 'xl font-semibold' }} mb-2 text-[var(--color-text)]">
+                                    {{ post.title }}
+                                </h3>
+                                <p class="text-[var(--color-gray-600)] mb-4">{{ post.excerpt }}</p>
+                                <div class="text-sm text-[var(--color-gray-400)] mb-3">{{ post.createdAt|date('d.m.Y H:i') }}</div>
+                                <span class="link-primary">Weiterlesen</span>
+                            </a>
                         </article>
                     {% endif %}
                 {% endfor %}
@@ -76,12 +77,12 @@
 
     <section class="mt-12 py-16 bg-white">
         <div class="container mx-auto px-4 lg:px-8">
-            <h2 class="text-3xl font-bold mb-6 text-center animate-fade-in-up">Heiße Themen im Forum</h2>
+            <h2 class="text-3xl font-bold mb-6 text-center text-[var(--color-text)] animate-fade-in-up">Heiße Themen im Forum</h2>
             <ul class="space-y-4">
                 {% for topic in ['Deployment-Tipps', 'Symfony 7 Tricks', 'Tailwind Hacks', 'Netcup Server-Setup'] %}
                     <li class="forum-item animate-fade-in-up">
-                        <a href="#" class="text-lg font-medium text-gray-800">{{ topic }}</a>
-                        <span class="text-sm text-gray-500">42 Antworten</span>
+                        <a href="#" class="text-lg font-medium text-[var(--color-gray-800)] hover:text-[var(--color-primary-500)] transition-colors">{{ topic }}</a>
+                        <span class="text-sm text-[var(--color-gray-500)]">42 Antworten</span>
                     </li>
                 {% endfor %}
             </ul>
@@ -91,10 +92,9 @@
     <section class="mt-12 bg-white py-16">
         <div class="container mx-auto px-4 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div class="animate-fade-in-up">
-                <h2 class="text-3xl font-bold mb-4">Was ist Ravitar?</h2>
-                <p class="text-gray-700 leading-relaxed">
-                    Ravitar ist eine modulare Plattform, die Wissen, Tools und Community für Entwickler &
-                    Systemadministratoren intelligent verbindet – damit du immer up-to-date bleibst.
+                <h2 class="text-3xl font-bold mb-4 text-[var(--color-text)]">Was ist Ravitar?</h2>
+                <p class="text-[var(--color-gray-700)] leading-relaxed">
+                    Ravitar ist eine modulare Plattform, die Wissen, Tools und Community für Entwickler & ...
                 </p>
             </div>
         </div>

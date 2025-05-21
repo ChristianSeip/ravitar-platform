@@ -4,7 +4,7 @@
 
         {% if pagination.hasPrevious() %}
             <a href="{{ path(app.request.attributes.get('_route'), routeParams | merge(app.request.query.all | merge({'page': pagination.page - 1}))) }}"
-               class="px-3 py-1 border border-gray-300 bg-white rounded hover:bg-gray-100">
+               class="px-3 py-1 rounded border border-[var(--color-gray-300)] bg-[var(--color-background)] text-[var(--color-gray-800)] hover:bg-[var(--color-gray-200)] transition-colors">
                 « Zurück
             </a>
         {% endif %}
@@ -12,14 +12,18 @@
         {% for i in 1..pagination.totalPages %}
             {% set isActive = i == pagination.page %}
             <a href="{{ path(app.request.attributes.get('_route'), routeParams | merge(app.request.query.all | merge({'page': i}))) }}"
-               class="px-3 py-1 border {{ isActive ? 'bg-blue-600 text-white border-blue-600 font-semibold' : 'border-gray-300 bg-white hover:bg-gray-100' }} rounded">
+               class="px-3 py-1 rounded border text-sm transition-colors
+                      {{ isActive
+               ? 'bg-[var(--color-primary-500)] text-white border-[var(--color-primary-500)] font-semibold'
+               : 'border-[var(--color-gray-300)] bg-[var(--color-background)] text-[var(--color-gray-800)] hover:bg-[var(--color-gray-200)]'
+               }}">
                 {{ i }}
             </a>
         {% endfor %}
 
         {% if pagination.hasNext() %}
             <a href="{{ path(app.request.attributes.get('_route'), routeParams | merge(app.request.query.all | merge({'page': pagination.page + 1}))) }}"
-               class="px-3 py-1 border border-gray-300 bg-white rounded hover:bg-gray-100">
+               class="px-3 py-1 rounded border border-[var(--color-gray-300)] bg-[var(--color-background)] text-[var(--color-gray-800)] hover:bg-[var(--color-gray-200)] transition-colors">
                 Weiter »
             </a>
         {% endif %}
