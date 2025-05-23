@@ -7,6 +7,12 @@ framework:
 
     #esi: true
     #fragments: true
+    http_client:
+        scoped_clients:
+            xenforo.client:
+                base_uri: '%env(XENFORO_API_URL)%'
+                headers:
+                    XF-Api-Key: '%env(XENFORO_API_KEY)%'
 
 when@test:
     framework:

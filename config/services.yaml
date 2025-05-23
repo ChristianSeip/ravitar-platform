@@ -37,3 +37,7 @@ services:
         arguments:
             $slugger: '@slugger'
             $doctrine: '@doctrine'
+    App\Domain\Common\Service\ForumHotTopicService:
+        arguments:
+            $xenforoClient: '@xenforo.client'
+            $cache: '@cache.app'
