@@ -91,13 +91,14 @@ class PostRepository extends ServiceEntityRepository
 
 	public function findLatest(int $limit): array
 	{
-		return $this->createQueryBuilder('p')
-			->leftJoin('p.tags', 't')
-			->addSelect('t')
+		$qb = $this->createQueryBuilder('p');
+		return $qb
+			->select('p')
 			->where('p.isDeleted = false')
 			->orderBy('p.createdAt', 'DESC')
 			->setMaxResults($limit)
 			->getQuery()
+			->setFetchMode(Post::class, 'tags', \Doctrine\ORM\Mapping\ClassMetadata::FETCH_EXTRA_LAZY)
 			->getResult();
 	}
 
