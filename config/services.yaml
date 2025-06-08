@@ -41,3 +41,15 @@ services:
         arguments:
             $xenforoClient: '@xenforo.client'
             $cache: '@cache.app'
+    App\Domain\Sitemap\Generator\:
+        resource: '../src/Domain/Sitemap/Generator'
+        autowire: true
+        autoconfigure: true
+        tags: ['app.sitemap_generator']
+    App\Domain\Sitemap\Builder\SitemapBuilderService:
+        arguments:
+            $generators: !tagged_iterator app.sitemap_generator
+        autowire: true
+        autoconfigure: true
+    App\Domain\Sitemap\Controller\SitemapController:
+        tags: ['controller.service_arguments']

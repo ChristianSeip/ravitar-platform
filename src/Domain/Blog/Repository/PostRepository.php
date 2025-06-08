@@ -125,4 +125,15 @@ class PostRepository extends ServiceEntityRepository
 			->getQuery()
 			->getResult();
 	}
+
+	public function findAllPublished(): array
+	{
+		return $this->createQueryBuilder('p')
+			->where('p.isDeleted = false')
+			->andWhere('p.createdAt <= :now')
+			->setParameter('now', new \DateTimeImmutable(), Types::DATETIME_IMMUTABLE)
+			->orderBy('p.createdAt', 'DESC')
+			->getQuery()
+			->getResult();
+	}
 }
