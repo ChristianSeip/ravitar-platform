@@ -6,6 +6,13 @@
     <title>{% block title %}{% endblock %} - Ravitar</title>
     {% block meta %}{% endblock %}
 
+    <link rel="icon" href="/images/favicon/favicon.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="/images/favicon/icon.svg">
+    <link rel="apple-touch-icon" href="/images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/images/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/images/favicon/android-chrome-512x512.png">
+
+
     {% block stylesheets %}
         {{ encore_entry_link_tags('app') }}
     {% endblock %}
