@@ -113,6 +113,9 @@
     .link-secondary {
         @apply text-[var(--color-gray-600)] hover:text-[var(--color-primary-500)] transition-colors underline-offset-2 hover:underline;
     }
+    .logo-letter {
+        filter: drop-shadow(38px 38px 24.8px rgba(0, 0, 0, 0.5));
+    }
 }
 
 @layer utilities {
