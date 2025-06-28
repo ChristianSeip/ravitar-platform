@@ -10,26 +10,39 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TagController extends AbstractController
 {
-	public function __construct(private readonly TranslatorInterface $translator)
+	public function __construct(private readonly TranslatorInterface $translator, private readonly CacheInterface $cache)
 	{
 	}
 
 	#[Route('/blog/tag/{slug}', name: 'blog_tag_overview')]
 	public function showByTag(string $slug, Request $request, PostRepository $postRepo, TagRepository $tagRepo, PaginationService $paginator): Response {
-		$tag = $tagRepo->findOneBy(['slug' => $slug]);
+		$tag = $this->cache->get("tag_by_slug_$slug", function (ItemInterface $item) use ($tagRepo, $slug) {
+			$item->expiresAfter(3600);
+			return $tagRepo->findOneBy(['slug' => $slug]);
+		});
 
 		$posts = [];
 		$pagination = null;
-		$total = 0;
 
 		if ($tag) {
+			$page = max(1, (int) $request->query->get('page', 1));
+
+			$cacheKeyPosts = "posts_by_tag_{$slug}_page_{$page}";
+			$posts = $this->cache->get($cacheKeyPosts, function (ItemInterface $item) use ($postRepo, $slug, $paginator, $request) {
+				$item->expiresAfter(300);
+				$total = $postRepo->countByTagSlug($slug);
+				$pagination = $paginator->paginate($request, $total);
+				return $postRepo->findByTagSlugPaginated($slug, $pagination->limit, $pagination->offset);
+			});
+
 			$total = $postRepo->countByTagSlug($slug);
 			$pagination = $paginator->paginate($request, $total);
-			$posts = $postRepo->findByTagSlugPaginated($slug, $pagination->limit, $pagination->offset);
 		}
 
 		return $this->render('blog/tag_view.html.twig', [
