@@ -99,6 +99,9 @@
 
         {# Desktop-Nav #}
         <nav class="hidden md:flex space-x-6 items-center">
+            <a href="{{ path('blog_tag_overview', { slug: 'ki' }) }}" class="text-[var(--color-gray-700)] hover:text-[var(--color-primary-700)] transition-colors">Künstliche Intelligenz</a>
+            <a href="{{ path('blog_tag_overview', { slug: 'datenschutz' }) }}" class="text-[var(--color-gray-700)] hover:text-[var(--color-primary-700)] transition-colors">Datenschutz</a>
+            <a href="{{ path('blog_tag_overview', { slug: 'softwareentwicklung' }) }}" class="text-[var(--color-gray-700)] hover:text-[var(--color-primary-700)] transition-colors">Development</a>
             <a href="{{ path('blog_post_list') }}" class="text-[var(--color-gray-700)] hover:text-[var(--color-primary-700)] transition-colors">Blog</a>
             <a href="https://forum.ravitar.com" class="text-[var(--color-gray-700)] hover:text-[var(--color-primary-700)] transition-colors">Community</a>
         </nav>
@@ -112,8 +115,11 @@
     </div>
 
     {# Mobile-Menu-Panel #}
-    <div data-menu-target="panel" class="md:hidden hidden">
+    <div data-menu-target="panel" class="md:hidden hidden absolute top-full left-0 w-full bg-white shadow-lg z-50 transition-transform duration-300 ease-out transform translate-y-[-10px] opacity-0">
         <nav class="px-4 py-2 space-y-2" data-action="click->menu#toggle">
+            <a href="{{ path('blog_tag_overview', { slug: 'ki' }) }}" class="block text-[var(--color-gray-700)] hover:text-[var(--color-primary-700)] transition-colors">Künstliche Intelligenz</a>
+            <a href="{{ path('blog_tag_overview', { slug: 'datenschutz' }) }}" class="block text-[var(--color-gray-700)] hover:text-[var(--color-primary-700)] transition-colors">Datenschutz</a>
+            <a href="{{ path('blog_tag_overview', { slug: 'softwareentwicklung' }) }}" class="block text-[var(--color-gray-700)] hover:text-[var(--color-primary-700)] transition-colors">Development</a>
             <a href="{{ path('blog_post_list') }}" class="block text-[var(--color-gray-700)] hover:text-[var(--color-primary-700)] transition-colors">Blog</a>
             <button type="button" class="block w-full text-left text-[var(--color-gray-700)] hover:text-[var(--color-primary-700)] transition-colors" data-action="search#toggle">Suche</button>
             <a href="https://forum.ravitar.com" class="block text-[var(--color-gray-700)] hover:text-[var(--color-primary-700)] transition-colors">Community</a>
