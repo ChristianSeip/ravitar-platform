@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Beiträge zu "{{ tag.name }}"{% endblock %}
+
+{% block meta %}
+    <meta property="og:title" content="Beiträge zu {{ tag.name }}">
+    <link rel="canonical" href="{{ absolute_url(path('blog_post_by_tag', {slug: tag.slug})) }}">
+{% endblock %}
+
+{% block content %}
+    <section class="mt-12 py-16">
+        <div class="container mx-auto px-4 lg:px-8">
+            <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center text-[var(--color-text)] animate-fade-in-up">
+                {{ 'blog.tag.overview_title'|trans }} {{ tag.name }}
+            </h1>
+
+            {% if posts|length > 0 %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 auto-rows-fr">
+                    {% for post in posts %}
+                        <article class="card-hover animate-fade-in-up animate-delay-{{ loop.index0 * 100 }}">
+                            <a href="{{ path('blog_post_show', {slug: post.slug}) }}">
+                                <h2 class="text-xl font-semibold mb-2 text-[var(--color-text)]">{{ post.title }}</h2>
+                                <p class="text-[var(--color-gray-600)] mb-3">{{ post.excerpt|slice(0, 150) ~ (post.excerpt|length > 150 ? '…' : '') }}</p>
+                                <div class="text-sm text-[var(--color-gray-400)] mb-3">{{ post.createdAt|date('d.m.Y H:i') }}</div>
+                                <span class="link-primary">Weiterlesen</span>
+                            </a>
+                        </article>
+                    {% endfor %}
+                </div>
+
+                {% include '_pagination.html.twig' with {
+                    pagination: pagination,
+                    routeParams: routeParams ?? {}
+                } %}
+            {% else %}
+                <p class="text-center text-gray-500 text-lg mt-10">{{ emptyText ?? 'blog.search.no_result'|trans }}</p>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

@@ -48,3 +48,4 @@ blog:
   tag:
     tag: "Tag"
     not_found: "Dieser Tag existiert nicht."
+    overview_title: "Beiträge zum Thema"
