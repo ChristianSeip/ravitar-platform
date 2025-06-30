@@ -37,4 +37,21 @@ class UserContextService
 		$user = $this->security->getUser();
 		return $user instanceof User ? $user : null;
 	}
+
+	public function isAdmin(): bool
+	{
+		$user = $this->getUserOrNull();
+		return $user instanceof User && $user->isAdmin();
+	}
+
+	public function isUser(): bool
+	{
+		$user = $this->getUserOrNull();
+		return $user instanceof User && $user->isUser();
+	}
+
+	public function isGuest(): bool
+	{
+		return $this->getUserOrNull() === null;
+	}
 }
