@@ -24,70 +24,31 @@
             <h2 class="text-3xl font-bold mb-8 text-center text-[var(--color-text)] animate-fade-in-up">Aktuelle Blog-Beiträge</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 auto-rows-fr gap-8">
-                {% set maxCols = 3 %}
-                {% set maxRows = 2 %}
-                {% set currentRow = 1 %}
-                {% set currentRowCols = 0 %}
-
                 {% for post in latestBlogPosts %}
                     {% set isFirst = loop.first %}
-                    {% set desiredCols = isFirst ? 2 : post.gridCols %}
-                    {% set desiredRows = post.gridRows %}
                     {% set charLen = isFirst ? 300 : 150 %}
+                    {% set spanClasses = isFirst
+                        ? 'md:col-span-2 md:row-span-1 lg:col-span-2 lg:row-span-1'
+                        : 'md:col-span-1 md:row-span-1 lg:col-span-1 lg:row-span-1'
+                    %}
 
-                    {% if currentRowCols + desiredCols > maxCols %}
-                        {% set currentRow = currentRow + 1 %}
-                        {% set currentRowCols = 0 %}
-                    {% endif %}
-
-                    {% if currentRow > maxRows %}
-                        {# NICHTS anzeigen #}
-                    {% else %}
-                        {% set availableCols = maxCols - currentRowCols %}
-                        {% set cols = desiredCols > availableCols ? availableCols : desiredCols %}
-                        {% set rows = desiredRows %}
-                        {% set currentRowCols = currentRowCols + cols %}
-
-                        {% set spanClasses = [
-                            'md:col-span-' ~ cols,
-                            'md:row-span-' ~ rows,
-                            'lg:col-span-' ~ cols,
-                            'lg:row-span-' ~ rows
-                        ]|join(' ') %}
-
-                        <article class="card-hover animate-fade-in-up animate-delay-{{ loop.index0 * 150 }} {{ spanClasses }}">
-                            <a href="{{ path('blog_post_show', {slug: post.slug}) }}">
-                                <h3 class="text-{{ isFirst ? '2xl font-bold' : 'xl font-semibold' }} mb-2 text-[var(--color-text)]">
-                                    {{ post.title }}
-                                </h3>
-                                <p class="text-[var(--color-gray-600)] mb-4">{{ post.excerpt|slice(0, charLen) ~ (post.excerpt|length > charLen ? '…' : '') }}</p>
-                                <div class="text-sm text-[var(--color-gray-400)] mb-3">{{ post.createdAt|date('d.m.Y H:i') }}</div>
-                                <span class="link-primary">Weiterlesen</span>
-                            </a>
-                        </article>
-                    {% endif %}
+                    <article class="card-hover animate-fade-in-up animate-delay-{{ loop.index0 * 150 }} {{ spanClasses }}">
+                        <a href="{{ path('blog_post_show', {slug: post.slug}) }}">
+                            <h3 class="text-{{ isFirst ? '2xl font-bold' : 'xl font-semibold' }} mb-2 text-[var(--color-text)]">
+                                {{ post.title }}
+                            </h3>
+                            <p class="text-[var(--color-gray-600)] mb-4">
+                                {{ post.excerpt|slice(0, charLen) ~ (post.excerpt|length > charLen ? '…' : '') }}
+                            </p>
+                            <div class="text-sm text-[var(--color-gray-400)] mb-3">{{ post.createdAt|date('d.m.Y H:i') }}</div>
+                            <span class="link-primary">Weiterlesen</span>
+                        </a>
+                    </article>
                 {% endfor %}
             </div>
         </div>
     </section>
 
-    <section class="mt-12 py-16 bg-white">
-        <div class="container mx-auto px-4 lg:px-8">
-            <h2 class="text-3xl font-bold mb-6 text-center text-[var(--color-text)] animate-fade-in-up">Heiße Themen im Forum</h2>
-            <ul class="space-y-4">
-                {% for topic in hotTopics %}
-                    <li class="forum-item animate-fade-in-up">
-                        <a href="{{ topic.url }}" class="block w-full h-full">
-                            <h3 class="text-lg font-medium text-[var(--color-gray-800)] hover:text-[var(--color-primary-500)] transition-colors">
-                                {{ topic.title }}
-                            </h3>
-                            {# <span class="text-sm text-[var(--color-gray-500)]">{{ topic.replies }} Antworten</span> #}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </section>
 
     <section class="mt-12 bg-white py-16">
         <div class="container mx-auto px-4 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
