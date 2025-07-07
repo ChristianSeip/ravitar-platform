@@ -65,7 +65,7 @@
             <div class="flex items-center space-x-4">
                 <div>
                     <p class="text-lg font-semibold text-gray-900">{{ post.author.username }}</p>
-                    <p class="text-gray-600">{{ post.author.profile.biography }}</p>
+                    <p class="text-gray-600">{{ post.author.profile.biography|markdown_to_html }}</p>
                 </div>
             </div>
         </section>
