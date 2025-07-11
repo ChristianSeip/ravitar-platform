@@ -115,8 +115,12 @@ class PostController extends AbstractController
 			throw $this->createNotFoundException($this->translator->trans('blog.post.not_found', [], 'messages'));
 		}
 
+		$neighbors = $postRepo->findPostNeighbors($post);
+
 		return $this->render('blog/show.html.twig', [
 			'post' => $post,
+			'previousPost' => $neighbors['previous'],
+			'nextPost' => $neighbors['next'],
 		]);
 	}
 

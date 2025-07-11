@@ -136,4 +136,33 @@ class PostRepository extends ServiceEntityRepository
 			->getQuery()
 			->getResult();
 	}
+
+	public function findPostNeighbors(Post $post): array
+	{
+		$qb = $this->createQueryBuilder('p')
+			->andWhere('p.id != :id')
+			->setParameter('id', $post->getId())
+			->andWhere('p.id < :id OR p.id > :id')
+			->orderBy('p.id', 'ASC');
+
+		$results = $qb->getQuery()->getResult();
+
+		$previous = null;
+		$next = null;
+
+		foreach ($results as $candidate) {
+			if ($candidate->getId() < $post->getId()) {
+				$previous = $candidate;
+			}
+			elseif ($candidate->getId() > $post->getId()) {
+				$next = $candidate;
+				break;
+			}
+		}
+
+		return [
+			'previous' => $previous,
+			'next' => $next,
+		];
+	}
 }
