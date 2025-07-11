@@ -104,11 +104,12 @@
     {% endif %}
 
     <script>
-			document.addEventListener('DOMContentLoaded', () => {
-				const text = document.getElementById('postContent').innerText;
-				const words = text.trim().split(/\s+/).length;
-				const readingTime = Math.max(1, Math.round(words / 200));
-				document.getElementById('readTime').textContent = `${readingTime} min`;
-			});
+			(function() {
+                const contentElement = document.getElementById('postContent');
+                const text = contentElement.innerText || contentElement.textContent || '';
+                const words = text.trim().split(/\s+/).length;
+                const minutes = Math.max(1, Math.round(words / 200));
+                document.getElementById('readTime').textContent = `${minutes} min`;
+            })();
     </script>
 {% endblock %}
