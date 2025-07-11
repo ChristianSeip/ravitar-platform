@@ -2,9 +2,29 @@
 
 namespace App\Domain\Blog\Service;
 
+/**
+ * Converts user-provided search input into a PostgreSQL tsquery string.
+ *
+ * Supports operators:
+ * - `"` for exact phrases
+ * - `+` for required terms
+ * - `-` for excluded terms
+ * - everything else is treated as optional
+ */
 class SearchParserService
 {
 
+	/**
+	 * Parses the raw search input and returns a PostgreSQL-compatible tsquery string.
+	 *
+	 * Examples:
+	 *   "some phrase" +required -excluded optional
+	 *   → "some <-> phrase" & required & optional & !excluded
+	 *
+	 * @param string $input Raw user input
+	 *
+	 * @return string Parsed tsquery string
+	 */
 	public function parse(string $input): string
 	{
 		$phrases = [];
@@ -56,11 +76,28 @@ class SearchParserService
 		return implode(' & ', array_filter($parts));
 	}
 
+	/**
+	 * Sanitizes a single word for safe use in tsquery.
+	 *
+	 * Removes special characters and punctuation.
+	 *
+	 * @param string $word
+	 *
+	 * @return string
+	 */
 	private function sanitizeWord(string $word): string
 	{
 		return preg_replace('/[^a-z0-9äöüß\-]+/iu', '', $word);
 	}
 
+
+	/**
+	 * Sanitizes a phrase and converts spaces into `<->` (phrase match) operators.
+	 *
+	 * @param string $phrase
+	 *
+	 * @return string
+	 */
 	private function sanitizePhrase(string $phrase): string
 	{
 		$phrase = preg_replace('/[^a-z0-9äöüß\s\-]+/iu', '', $phrase);

@@ -32,6 +32,15 @@ class PostController extends AbstractController
 	{
 	}
 
+	/**
+	 * Displays a paginated list of all published posts.
+	 *
+	 * @param Request $request
+	 * @param PostRepository $postRepo
+	 * @param PaginationService $paginator
+	 *
+	 * @return Response
+	 */
 	#[Route('/blog/posts', name: 'blog_post_list')]
 	public function list(Request $request, PostRepository $postRepo, PaginationService $paginator): Response
 	{
@@ -49,6 +58,15 @@ class PostController extends AbstractController
 		]);
 	}
 
+	/**
+	 * Creates or edits a blog post.
+	 *
+	 * @param Request $request
+	 * @param PostRepository $postRepo
+	 * @param string|null $slug
+	 *
+	 * @return Response
+	 */
 	#[Route('/blog/posts/new', name: 'blog_post_create')]
 	#[Route('/blog/posts/{slug}/edit', name: 'blog_post_edit')]
 	#[IsGranted('ROLE_ADMIN')]
@@ -106,6 +124,16 @@ class PostController extends AbstractController
 		]);
 	}
 
+	/**
+	 * Displays a single blog post.
+	 *
+	 * Also loads the previous and next post, if available.
+	 *
+	 * @param string $slug
+	 * @param PostRepository $postRepo
+	 *
+	 * @return Response
+	 */
 	#[Route('/blog/posts/{slug}', name: 'blog_post_show')]
 	public function __invoke(string $slug, PostRepository $postRepo): Response
 	{
@@ -124,6 +152,17 @@ class PostController extends AbstractController
 		]);
 	}
 
+	/**
+	 * Displays posts by tag, paginated.
+	 *
+	 * @param string $slug
+	 * @param Request $request
+	 * @param PostRepository $postRepo
+	 * @param TagRepository $tagRepo
+	 * @param PaginationService $paginator
+	 *
+	 * @return Response
+	 */
 	#[Route('/blog/posts/tag/{slug}', name: 'blog_post_by_tag')]
 	public function showByTag(string $slug, Request $request, PostRepository $postRepo, TagRepository $tagRepo, PaginationService $paginator): Response {
 		$tag = $tagRepo->findOneBy(['slug' => $slug]);

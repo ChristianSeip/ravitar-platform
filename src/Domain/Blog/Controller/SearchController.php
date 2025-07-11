@@ -16,6 +16,16 @@ class SearchController extends AbstractController {
 	{
 	}
 
+	/**
+	 * Performs a full-text search on blog posts using PostgreSQL tsquery.
+	 *
+	 * Renders a paginated list of results or an empty state if no query or no matches are found.
+	 *
+	 * @param Request $request
+	 * @param PaginationService $paginator
+	 *
+	 * @return Response
+	 */
 	#[Route('/blog/search', name: 'blog_post_search')]
 	public function __invoke(Request $request, PaginationService $paginator): Response
 	{

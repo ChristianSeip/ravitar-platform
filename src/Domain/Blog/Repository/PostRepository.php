@@ -14,6 +14,13 @@ class PostRepository extends ServiceEntityRepository
 		parent::__construct($registry, Post::class);
 	}
 
+	/**
+	 * Returns the total number of posts associated with a given tag slug.
+	 *
+	 * @param string $slug
+	 *
+	 * @return int
+	 */
 	public function countByTagSlug(string $slug): int
 	{
 		return (int) $this->createTagQueryBuilder($slug)
@@ -22,6 +29,13 @@ class PostRepository extends ServiceEntityRepository
 			->getSingleScalarResult();
 	}
 
+	/**
+	 * Returns all posts associated with a given tag slug.
+	 *
+	 * @param string $slug
+	 *
+	 * @return Post[]
+	 */
 	public function findByTagSlug(string $slug): array
 	{
 		return $this->createTagQueryBuilder($slug)
@@ -31,6 +45,15 @@ class PostRepository extends ServiceEntityRepository
 			->getResult();
 	}
 
+	/**
+	 * Returns a paginated list of posts for a given tag slug.
+	 *
+	 * @param string $slug
+	 * @param int $limit
+	 * @param int $offset
+	 *
+	 * @return Post[]
+	 */
 	public function findByTagSlugPaginated(string $slug, int $limit, int $offset): array
 	{
 		return $this->createTagQueryBuilder($slug)
@@ -42,6 +65,13 @@ class PostRepository extends ServiceEntityRepository
 			->getResult();
 	}
 
+	/**
+	 * Builds a base query for posts matching a specific tag slug.
+	 *
+	 * @param string $slug
+	 *
+	 * @return \Doctrine\ORM\QueryBuilder
+	 */
 	private function createTagQueryBuilder(string $slug)
 	{
 		return $this->createQueryBuilder('p')
@@ -51,6 +81,13 @@ class PostRepository extends ServiceEntityRepository
 			->setParameter('slug', $slug);
 	}
 
+	/**
+	 * Returns the number of posts matching a PostgreSQL fulltext ts_query.
+	 *
+	 * @param string $tsQuery
+	 *
+	 * @return int
+	 */
 	public function countByTsQuery(string $tsQuery): int
 	{
 		$conn = $this->getEntityManager()->getConnection();
@@ -67,6 +104,15 @@ class PostRepository extends ServiceEntityRepository
 			->fetchOne();
 	}
 
+	/**
+	 * Returns a paginated list of posts matching a fulltext search query.
+	 *
+	 * @param string $tsQuery
+	 * @param int $limit
+	 * @param int $offset
+	 *
+	 * @return Post[]
+	 */
 	public function findByTsQuery(string $tsQuery, int $limit, int $offset): array
 	{
 		$conn = $this->getEntityManager()->getConnection();
@@ -89,6 +135,13 @@ class PostRepository extends ServiceEntityRepository
 		return $ids ? $this->findBy(['id' => $ids], ['createdAt' => 'DESC']) : [];
 	}
 
+	/**
+	 * Returns the latest published posts, limited by a given number.
+	 *
+	 * @param int $limit
+	 *
+	 * @return Post[]
+	 */
 	public function findLatest(int $limit): array
 	{
 		$qb = $this->createQueryBuilder('p');
@@ -102,6 +155,11 @@ class PostRepository extends ServiceEntityRepository
 			->getResult();
 	}
 
+	/**
+	 * Returns the total number of non-deleted, published posts.
+	 *
+	 * @return int
+	 */
 	public function countAll(): int
 	{
 		return (int) $this->createQueryBuilder('p')
@@ -113,6 +171,14 @@ class PostRepository extends ServiceEntityRepository
 			->getSingleScalarResult();
 	}
 
+	/**
+	 * Returns a paginated list of all published posts.
+	 *
+	 * @param int $limit
+	 * @param int $offset
+	 *
+	 * @return Post[]
+	 */
 	public function findAllPaginated(int $limit, int $offset): array
 	{
 		return $this->createQueryBuilder('p')
@@ -126,6 +192,11 @@ class PostRepository extends ServiceEntityRepository
 			->getResult();
 	}
 
+	/**
+	 * Returns all published and non-deleted posts.
+	 *
+	 * @return Post[]
+	 */
 	public function findAllPublished(): array
 	{
 		return $this->createQueryBuilder('p')
@@ -137,6 +208,13 @@ class PostRepository extends ServiceEntityRepository
 			->getResult();
 	}
 
+	/**
+	 * Finds the previous and next post relative to the given post (based on ID).
+	 *
+	 * @param Post $post
+	 *
+	 * @return array{previous: Post|null, next: Post|null}
+	 */
 	public function findPostNeighbors(Post $post): array
 	{
 		$qb = $this->createQueryBuilder('p')
