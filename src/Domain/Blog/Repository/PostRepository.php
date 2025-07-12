@@ -5,6 +5,8 @@ namespace App\Domain\Blog\Repository;
 use App\Domain\Blog\Entity\Post;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 class PostRepository extends ServiceEntityRepository
@@ -51,18 +53,19 @@ class PostRepository extends ServiceEntityRepository
 	 * @param string $slug
 	 * @param int $limit
 	 * @param int $offset
+	 * @param bool $publishedOnly
 	 *
 	 * @return Post[]
 	 */
-	public function findByTagSlugPaginated(string $slug, int $limit, int $offset): array
+	public function findByTagSlugPaginated(string $slug, int $limit, int $offset, bool $publishedOnly = true): array
 	{
-		return $this->createTagQueryBuilder($slug)
+		$qb = $this->createTagQueryBuilder($slug)
 			->addSelect('t')
 			->orderBy('p.createdAt', 'DESC')
 			->setMaxResults($limit)
-			->setFirstResult($offset)
-			->getQuery()
-			->getResult();
+			->setFirstResult($offset);
+		$qb = $this->applyPublicationFilters($qb, $publishedOnly);
+		return $qb->getQuery()->getResult();
 	}
 
 	/**
@@ -70,14 +73,13 @@ class PostRepository extends ServiceEntityRepository
 	 *
 	 * @param string $slug
 	 *
-	 * @return \Doctrine\ORM\QueryBuilder
+	 * @return QueryBuilder
 	 */
 	private function createTagQueryBuilder(string $slug)
 	{
 		return $this->createQueryBuilder('p')
 			->innerJoin('p.tags', 't')
 			->where('t.slug = :slug')
-			->andWhere('p.isDeleted = false')
 			->setParameter('slug', $slug);
 	}
 
@@ -95,6 +97,7 @@ class PostRepository extends ServiceEntityRepository
 		$sql = <<<SQL
         SELECT COUNT(*) FROM blog_post
         WHERE is_deleted = false
+        	AND created_at <= NOW()
           AND to_tsvector('german', title || ' ' || content)
           @@ to_tsquery('german', :query)
         SQL;
@@ -120,6 +123,7 @@ class PostRepository extends ServiceEntityRepository
 		$sql = <<<SQL
         SELECT id FROM blog_post
         WHERE is_deleted = false
+        	AND created_at <= NOW()
           AND to_tsvector('german', title || ' ' || content)
           @@ to_tsquery('german', :query)
         ORDER BY created_at DESC
@@ -139,36 +143,34 @@ class PostRepository extends ServiceEntityRepository
 	 * Returns the latest published posts, limited by a given number.
 	 *
 	 * @param int $limit
+	 * @param bool $publishedOnly
 	 *
 	 * @return Post[]
 	 */
-	public function findLatest(int $limit): array
+	public function findLatest(int $limit, bool $publishedOnly = true): array
 	{
-		$qb = $this->createQueryBuilder('p');
-		return $qb
+		$qb = $this->createQueryBuilder('p')
 			->select('p')
-			->where('p.isDeleted = false')
 			->orderBy('p.createdAt', 'DESC')
-			->setMaxResults($limit)
-			->getQuery()
-			->setFetchMode(Post::class, 'tags', \Doctrine\ORM\Mapping\ClassMetadata::FETCH_EXTRA_LAZY)
+			->setMaxResults($limit);
+		$qb = $this->applyPublicationFilters($qb, $publishedOnly);
+		return $qb->getQuery()
+			->setFetchMode(Post::class, 'tags', ClassMetadata::FETCH_EXTRA_LAZY)
 			->getResult();
 	}
 
 	/**
 	 * Returns the total number of non-deleted, published posts.
 	 *
+	 * @param bool $publishedOnly
+	 *
 	 * @return int
 	 */
-	public function countAll(): int
+	public function countAll(bool $publishedOnly = true): int
 	{
-		return (int) $this->createQueryBuilder('p')
-			->select('COUNT(p.id)')
-			->where('p.isDeleted = false')
-			->andWhere('p.createdAt <= :now')
-			->setParameter('now', new \DateTimeImmutable(), Types::DATETIME_IMMUTABLE)
-			->getQuery()
-			->getSingleScalarResult();
+		$qb = $this->createQueryBuilder('p')->select('COUNT(p.id)');
+		$qb = $this->applyPublicationFilters($qb, $publishedOnly);
+		return (int) $qb->getQuery()->getSingleScalarResult();
 	}
 
 	/**
@@ -176,36 +178,32 @@ class PostRepository extends ServiceEntityRepository
 	 *
 	 * @param int $limit
 	 * @param int $offset
+	 * @param bool $publishedOnly
 	 *
 	 * @return Post[]
 	 */
-	public function findAllPaginated(int $limit, int $offset): array
+	public function findAllPaginated(int $limit, int $offset, bool $publishedOnly = true): array
 	{
-		return $this->createQueryBuilder('p')
-			->where('p.isDeleted = false')
-			->andWhere('p.createdAt <= :now')
-			->setParameter('now', new \DateTimeImmutable(), Types::DATETIME_IMMUTABLE)
+		$qb = $this->createQueryBuilder('p')
 			->orderBy('p.createdAt', 'DESC')
 			->setMaxResults($limit)
-			->setFirstResult($offset)
-			->getQuery()
-			->getResult();
+			->setFirstResult($offset);
+		$qb = $this->applyPublicationFilters($qb, $publishedOnly);
+		return $qb->getQuery()->getResult();
 	}
 
 	/**
 	 * Returns all published and non-deleted posts.
 	 *
+	 * @param bool $publishedOnly
+	 *
 	 * @return Post[]
 	 */
-	public function findAllPublished(): array
+	public function findAllPublished(bool $publishedOnly = true): array
 	{
-		return $this->createQueryBuilder('p')
-			->where('p.isDeleted = false')
-			->andWhere('p.createdAt <= :now')
-			->setParameter('now', new \DateTimeImmutable(), Types::DATETIME_IMMUTABLE)
-			->orderBy('p.createdAt', 'DESC')
-			->getQuery()
-			->getResult();
+		$qb = $this->createQueryBuilder('p')->orderBy('p.createdAt', 'DESC');
+		$qb = $this->applyPublicationFilters($qb, $publishedOnly);
+		return $qb->getQuery()->getResult();
 	}
 
 	/**
@@ -222,6 +220,7 @@ class PostRepository extends ServiceEntityRepository
 			->setParameter('id', $post->getId())
 			->andWhere('p.id < :id OR p.id > :id')
 			->orderBy('p.id', 'ASC');
+		$qb = $this->applyPublicationFilters($qb, true);
 
 		$results = $qb->getQuery()->getResult();
 
@@ -242,5 +241,25 @@ class PostRepository extends ServiceEntityRepository
 			'previous' => $previous,
 			'next' => $next,
 		];
+	}
+
+	private function applyPublicationFilters(QueryBuilder $qb, bool $publishedOnly = true): QueryBuilder
+	{
+		if ($publishedOnly) {
+			$qb->andWhere('p.isDeleted = false')
+				->andWhere('p.createdAt <= :now')
+				->setParameter('now', new \DateTimeImmutable(), Types::DATETIME_IMMUTABLE);
+		}
+		return $qb;
+	}
+
+	public function findOneBySlug(string $slug, bool $publishedOnly = true): ?Post
+	{
+		$qb = $this->createQueryBuilder('p')
+			->where('p.slug = :slug')
+			->setParameter('slug', $slug)
+			->setMaxResults(1);
+		$qb = $this->applyPublicationFilters($qb, $publishedOnly);
+		return $qb->getQuery()->getOneOrNullResult();
 	}
 }

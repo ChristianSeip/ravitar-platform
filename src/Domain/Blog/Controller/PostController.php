@@ -137,9 +137,9 @@ class PostController extends AbstractController
 	#[Route('/blog/posts/{slug}', name: 'blog_post_show')]
 	public function __invoke(string $slug, PostRepository $postRepo): Response
 	{
-		$post = $postRepo->findOneBy(['slug' => $slug]);
+		$post = $postRepo->findOneBySlug($slug, !$this->userContext->isAdmin());
 
-		if (!$post || $post->isDeleted()) {
+		if (!$post) {
 			throw $this->createNotFoundException($this->translator->trans('blog.post.not_found', [], 'messages'));
 		}
 
