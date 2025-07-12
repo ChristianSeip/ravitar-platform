@@ -207,7 +207,7 @@ class PostRepository extends ServiceEntityRepository
 	}
 
 	/**
-	 * Finds the previous and next post relative to the given post (based on ID).
+	 * Returns the previous and next post relative to the given post (based on ID).
 	 *
 	 * @param Post $post
 	 *
@@ -215,27 +215,21 @@ class PostRepository extends ServiceEntityRepository
 	 */
 	public function findPostNeighbors(Post $post): array
 	{
-		$qb = $this->createQueryBuilder('p')
-			->andWhere('p.id != :id')
+		$previousQb = $this->createQueryBuilder('p')
+			->where('p.id < :id')
 			->setParameter('id', $post->getId())
-			->andWhere('p.id < :id OR p.id > :id')
-			->orderBy('p.id', 'ASC');
-		$qb = $this->applyPublicationFilters($qb, true);
+			->orderBy('p.id', 'DESC')
+			->setMaxResults(1);
+		$previousQb = $this->applyPublicationFilters($previousQb, true);
+		$previous = $previousQb->getQuery()->getOneOrNullResult();
 
-		$results = $qb->getQuery()->getResult();
-
-		$previous = null;
-		$next = null;
-
-		foreach ($results as $candidate) {
-			if ($candidate->getId() < $post->getId()) {
-				$previous = $candidate;
-			}
-			elseif ($candidate->getId() > $post->getId()) {
-				$next = $candidate;
-				break;
-			}
-		}
+		$nextQb = $this->createQueryBuilder('p')
+			->where('p.id > :id')
+			->setParameter('id', $post->getId())
+			->orderBy('p.id', 'ASC')
+			->setMaxResults(1);
+		$nextQb = $this->applyPublicationFilters($nextQb, true);
+		$next = $nextQb->getQuery()->getOneOrNullResult();
 
 		return [
 			'previous' => $previous,
