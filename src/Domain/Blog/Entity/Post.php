@@ -53,10 +53,14 @@ class Post
 	#[ORM\Column(type: 'smallint')]
 	private int $gridCols = 1;
 
+	#[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'post', orphanRemoval: true)]
+	private Collection $comments;
+
 	public function __construct()
 	{
 		$this->createdAt = new \DateTimeImmutable();
 		$this->tags = new ArrayCollection();
+		$this->comments = new ArrayCollection();
 	}
 
 	public function getId(): ?int
@@ -204,5 +208,10 @@ class Post
 	{
 		$this->gridCols = $cols;
 		return $this;
+	}
+
+	public function getComments(): Collection
+	{
+		return $this->comments;
 	}
 }
