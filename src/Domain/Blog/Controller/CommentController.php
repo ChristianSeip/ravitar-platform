@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class CommentController extends AbstractController
 {
@@ -25,7 +24,7 @@ class CommentController extends AbstractController
 	#[Route('/post/{id}/comment', name: 'comment_add', methods: ['POST'])]
 	public function add(int $id, Request $request, PostRepository $postRepository): JsonResponse
 	{
-		if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
+		if ($this->userContext->isGuest()) {
 			return new JsonResponse(['success' => false, 'error' => 'Du musst dich anmelden, um Kommentare zu schreiben.'], Response::HTTP_UNAUTHORIZED);
 		}
 
