@@ -19,7 +19,9 @@
     <section class="bg-white">
         {% if post.featuredImage %}
             <div class="w-full max-w-4xl mx-auto">
-                <img src="{{ asset('uploads/blog/' ~ post.featuredImage) }}" alt="Featured image" class="w-full object-cover rounded-xl shadow" style="aspect-ratio: 16 / 9; max-height: 600px;" loading="lazy">
+                <img src="{{ asset('uploads/blog/' ~ post.featuredImage) }}" alt="Featured image"
+                     class="w-full object-cover rounded-xl shadow" style="aspect-ratio: 16 / 9; max-height: 600px;"
+                     loading="lazy">
             </div>
         {% endif %}
 
@@ -84,7 +86,8 @@
             <ul class="flex flex-wrap gap-2">
                 {% for tag in post.tags %}
                     <li>
-                        <a href="{{ path('blog_post_by_tag', {slug: tag.slug}) }}" class="inline-block bg-gray-200 text-gray-800 text-xs px-3 py-1 rounded-full hover:bg-gray-300 transition">#{{ tag.name }}</a>
+                        <a href="{{ path('blog_post_by_tag', {slug: tag.slug}) }}"
+                           class="inline-block bg-gray-200 text-gray-800 text-xs px-3 py-1 rounded-full hover:bg-gray-300 transition">#{{ tag.name }}</a>
                     </li>
                 {% endfor %}
             </ul>
@@ -103,13 +106,139 @@
         </section>
     {% endif %}
 
+    <section class="max-w-3xl mx-auto px-6 py-12 mt-16 border-t border-gray-200" id="comments">
+        <h2 class="text-xl font-bold text-gray-900 mb-6">Kommentare</h2>
+
+        <div id="main-comment-form" class="mt-10">
+            {% include 'blog/_comment_form.html.twig' with { post: post, parent: null } %}
+        </div>
+
+        <div id="comment-list">
+            {% for comment in comments %}
+                {% if comment.parent is null %}
+                    {% include 'blog/_comment.html.twig' with { comment: comment, post: post, comments: comments } %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+
     <script>
-			(function() {
-                const contentElement = document.getElementById('postContent');
-                const text = contentElement.innerText || contentElement.textContent || '';
-                const words = text.trim().split(/\s+/).length;
-                const minutes = Math.max(1, Math.round(words / 200));
-                document.getElementById('readTime').textContent = `${minutes} min`;
-            })();
+			(function ()
+			{
+				const contentElement = document.getElementById("postContent");
+				const text = contentElement.innerText || contentElement.textContent || "";
+				const words = text.trim().split(/\s+/).length;
+				const minutes = Math.max(1, Math.round(words / 200));
+				document.getElementById("readTime").textContent = `${minutes} min`;
+			})();
+
+			function handleCommentFormSubmit(form)
+			{
+				const postId = form.dataset.postId;
+				const parentId = form.dataset.parentId;
+				const formData = new FormData(form);
+
+				if (parentId) {
+					formData.append("parent_id", parentId);
+				}
+
+				fetch(`/post/${postId}/comment`, {
+					method: "POST",
+					body: formData,
+					headers: {"X-Requested-With": "XMLHttpRequest"}
+				})
+					.then(async res =>
+					{
+						const json = await res.json();
+
+						if (!res.ok) {
+							// HTTP-Code z.B. 401, 403, 500 usw.
+							const message =
+								json.error ||
+								json.message ||
+								"Ein unbekannter Fehler ist aufgetreten.";
+
+							showNotice(message, "danger");
+							return;
+						}
+
+						if (json.success) {
+							const target = parentId
+								? document.querySelector(`.replies[data-parent-id="${parentId}"]`)
+								: document.getElementById("comment-list");
+
+							if (target) {
+								target.insertAdjacentHTML("beforeend", json.html);
+							}
+
+							if (form.closest("#main-comment-form")) {
+								form.reset();
+							}
+							else {
+								form.remove();
+							}
+						}
+						else {
+							// validierte Fehler (z.B. required-Felder)
+							const firstError =
+								(typeof json.errors === "object" && Object.values(json.errors)[0][0]) ||
+								json.error ||
+								"Kommentar konnte nicht gespeichert werden.";
+
+							showNotice(firstError, "danger");
+						}
+					})
+					.catch(() => showNotice("Fehler beim Absenden.", "danger"));
+			}
+
+			(function ()
+			{
+				const mainForm = document.querySelector("#main-comment-form .comment-form");
+				if (mainForm) {
+					mainForm.addEventListener("submit", e =>
+					{
+						e.preventDefault();
+						handleCommentFormSubmit(mainForm);
+					});
+				}
+
+				document.querySelectorAll(".reply-toggle").forEach(button =>
+				{
+					button.addEventListener("click", () =>
+					{
+						document.querySelectorAll(".reply-form-container .comment-form").forEach(f => f.remove());
+
+						const commentId = button.dataset.commentId;
+						const container = document.querySelector(`.reply-form-container[data-reply-to="${commentId}"]`);
+						const originalForm = document.querySelector("#main-comment-form .comment-form");
+
+						if (!container || !originalForm) {
+							return;
+						}
+
+						const replyForm = originalForm.cloneNode(true);
+						replyForm.dataset.parentId = commentId;
+
+						replyForm.querySelector("[name=\"parent_id\"]")?.remove();
+
+						const hiddenInput = document.createElement("input");
+						hiddenInput.type = "hidden";
+						hiddenInput.name = "parent_id";
+						hiddenInput.value = commentId;
+						replyForm.appendChild(hiddenInput);
+
+						container.classList.remove("hidden");
+						container.appendChild(replyForm);
+
+						replyForm.addEventListener("submit", e =>
+						{
+							e.preventDefault();
+							handleCommentFormSubmit(replyForm);
+						});
+					});
+				});
+			})();
+
+
     </script>
 {% endblock %}

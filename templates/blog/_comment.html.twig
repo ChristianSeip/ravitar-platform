@@ -1,0 +1,25 @@
+<article class="mb-6 border-b pb-4 border-gray-100">
+    <header class="text-sm text-gray-600 mb-2">
+        {{ comment.author.username ?? 'Unbekannter Nutzer' }} –
+        {{ comment.createdAt|date('d.m.Y H:i') }}
+    </header>
+
+    <div class="text-gray-800 mb-2">
+        {{ comment.message|nl2br }}
+    </div>
+
+    <button class="text-sm text-blue-600 hover:underline reply-toggle" data-comment-id="{{ comment.id }}">Antworten</button>
+
+    <div class="reply-form-container mt-4 hidden" data-reply-to="{{ comment.id }}"></div>
+
+    <div class="pl-4 mt-4 border-l border-gray-200 replies" data-parent-id="{{ comment.id }}">
+        {% for reply in replies[comment.id] ?? [] %}
+            {% include 'blog/_comment.html.twig' with {
+                comment: reply,
+                post: post,
+                replies: replies
+            } %}
+        {% endfor %}
+    </div>
+
+</article>

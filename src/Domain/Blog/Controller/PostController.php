@@ -2,8 +2,11 @@
 
 namespace App\Domain\Blog\Controller;
 
+use App\Domain\Blog\Entity\Comment;
 use App\Domain\Blog\Entity\Post;
+use App\Domain\Blog\Form\CommentFormType;
 use App\Domain\Blog\Form\PostFormType;
+use App\Domain\Blog\Repository\CommentRepository;
 use App\Domain\Blog\Repository\PostRepository;
 use App\Domain\Blog\Repository\TagRepository;
 use App\Domain\Blog\Service\TagService;
@@ -13,6 +16,7 @@ use App\Domain\Common\Service\SlugService;
 use App\Domain\User\Service\UserContextService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -131,11 +135,12 @@ class PostController extends AbstractController
 	 *
 	 * @param string $slug
 	 * @param PostRepository $postRepo
+	 * @param CommentRepository $commentRepo
 	 *
 	 * @return Response
 	 */
 	#[Route('/blog/posts/{slug}', name: 'blog_post_show')]
-	public function __invoke(string $slug, PostRepository $postRepo): Response
+	public function __invoke(string $slug, PostRepository $postRepo, CommentRepository $commentRepo, FormFactoryInterface $formFactory): Response
 	{
 		$post = $postRepo->findOneBySlug($slug, !$this->userContext->isAdmin());
 
@@ -145,10 +150,19 @@ class PostController extends AbstractController
 
 		$neighbors = $postRepo->findPostNeighbors($post);
 
+		$comment = new Comment();
+		$comment->setPost($post);
+		$form = $formFactory->create(CommentFormType::class, $comment);
+
+		$structured = $commentRepo->findCommentsByPostStructured($post);
+
 		return $this->render('blog/show.html.twig', [
 			'post' => $post,
 			'previousPost' => $neighbors['previous'],
 			'nextPost' => $neighbors['next'],
+			'comments' => $structured['root'],
+			'replies' => $structured['children'],
+			'form' => $form->createView(),
 		]);
 	}
 

@@ -1,0 +1,14 @@
+{% include '_form_wrapper.html.twig' with {
+    form: form,
+    title: parent is defined and parent ? 'Antwort auf Kommentar' : 'Kommentar schreiben',
+    button_label: 'Absenden',
+    form_action: '',
+    form_method: 'post',
+    form_novalidate: true,
+    form_render_rest: true,
+    form_attr: {
+        'data-post-id': post.id,
+        'data-parent-id': parent is defined and parent ? parent.id : '',
+        'class': 'comment-form'
+    }
+} %}
