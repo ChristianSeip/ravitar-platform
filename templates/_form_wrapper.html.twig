@@ -3,7 +3,14 @@
         <h2 class="text-2xl font-semibold text-[var(--color-text)] mb-6">{{ title }}</h2>
     {% endif %}
 
-    {{ form_start(form, { attr: { class: 'space-y-6' } }) }}
+    {% set final_form_attr = { class: 'space-y-6' }|merge(form_attr|default({})) %}
+    {{ form_start(form, {
+        method: form_method|default('post'),
+        action: form_action|default(null),
+        attr: final_form_attr,
+        novalidate: form_novalidate|default(false),
+        render_rest: form_render_rest|default(true)
+    }) }}
     {{ form_errors(form) }}
 
     {% set default_widget_attr = {
